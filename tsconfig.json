@@ -1,4 +1,5 @@
 {
+  "include": ["./src/**/*"],
   "compilerOptions": {
     "target": "ES2021",
     "lib": ["DOM", "DOM.Iterable", "ES2021"],
@@ -8,10 +9,14 @@
     "moduleResolution": "node",
     "types": ["@cloudflare/workers-types"],
     "resolveJsonModule": true,
-    "noEmit": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "noEmit": true
+    // "declaration": true,
+    // "emitDeclarationOnly": true,
+    // "outDir": "dist"
   }
 }
