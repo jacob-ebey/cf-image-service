@@ -1,0 +1,14 @@
+name = "image-service"
+main = "src/index.tsx"
+compatibility_date = "2022-12-05"
+
+workers_dev = false
+
+[[r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "images-service-bucket"
+preview_bucket_name = "images-service-bucket-preview"
+
+[[env.preview.r2_buckets]]
+binding = "FILES_BUCKET"
+bucket_name = "images-service-bucket-preview"
