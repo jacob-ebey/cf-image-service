@@ -1,6 +1,10 @@
 {
   "name": "cf-image-service",
   "version": "0.0.0",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "wrangler dev --local --persist",

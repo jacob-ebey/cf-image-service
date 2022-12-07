@@ -1,3 +1,5 @@
+/// <reference types="@cloudflare/workers-types" />
+
 import {
   isRouteErrorResponse,
   unstable_createStaticHandler,
@@ -6,7 +8,7 @@ import {
   type LoaderFunction,
   type LoaderFunctionArgs,
 } from "@remix-run/router";
-import { type Jsonify } from "type-fest";
+import { type Exact, type Jsonify } from "type-fest";
 
 type RequestMethod =
   | "GET"
@@ -81,20 +83,22 @@ export interface DataFunctionArgs<
 
 type UserDataFunction<
   TRequest extends TypedRequest<any, any, any, any>,
-  TContext
-> = (
-  args: DataFunctionArgs<TRequest, TContext>
-) => Response | Promise<Response>;
+  TContext,
+  TResponse extends Response
+> = (args: DataFunctionArgs<TRequest, TContext>) => TResponse;
 
 function dataFunction<
   TRequest extends TypedRequest<any, any, any, any>,
+  TResponse extends Response,
   TContext = unknown
->(func: UserDataFunction<TRequest, TContext>): ActionFunction | LoaderFunction {
+>(
+  func: UserDataFunction<TRequest, TContext, TResponse>
+): ActionFunction | LoaderFunction {
   return (args) => {
     const request = typeRequest<TRequest>(args.request);
     return func({
       ...args,
-      context: args.context as TContext,
+      context: {} as TContext,
       request,
     });
   };
@@ -109,10 +113,15 @@ function typeRequest<TRequest extends TypedRequest<any, any, any, any>>(
   return result;
 }
 
-export interface JsonResponse<Status extends number, Data>
+export interface JsonResponse<Status extends number, Data = unknown>
   extends Omit<Response, "json" | "status"> {
+  " json ": Data;
   json(): Promise<Jsonify<Data>>;
   status: Status;
+}
+
+export interface UnknownResponse extends Omit<Response, "status"> {
+  status: unknown;
 }
 
 export function json<T, Status extends number>(
@@ -131,11 +140,11 @@ type RouteConfig<
   TRequest extends TypedRequest<any, any, {}, {}>,
   TContext
 > = Omit<AgnosticDataNonIndexRouteObject, "children" | "loader" | "action"> & {
-  loader?: UserDataFunction<TRequest, TContext>;
-  action?: UserDataFunction<TRequest, TContext>;
+  loader?: UserDataFunction<TRequest, TContext, any>;
+  action?: UserDataFunction<TRequest, TContext, any>;
 };
 
-export function createHandler<Routes extends RouteConfig<any, any>[]>(
+export function createHandler<Routes extends readonly RouteConfig<any, any>[]>(
   routes: Routes,
   options?: {
     onError?: (error: unknown) => void;
@@ -149,33 +158,39 @@ export function createHandler<Routes extends RouteConfig<any, any>[]>(
     }))
   );
 
-  // TODO: Do some magic here to type response returns as a union of
-  // loader and action returns
-  type ResponseType = Response;
+  type DataResult<Func extends UserDataFunction<any, any, any> | undefined> =
+    Func extends undefined ? never : Awaited<ReturnType<Func>>;
+
+  type TypeResponseOnly<T> = T extends JsonResponse<any, any> ? T : never;
+
+  type RouteType = Routes extends (infer U)[]
+    ? U
+    : { action: never; loader: never };
+  type JsonResponseType =
+    | TypeResponseOnly<DataResult<RouteType["action"]>>
+    | TypeResponseOnly<DataResult<RouteType["loader"]>>;
 
   return async <RequestContext = unknown>(
     request: Request,
     requestContext: RequestContext
-  ): Promise<ResponseType | Response> => {
+  ): Promise<JsonResponseType | UnknownResponse> => {
     try {
-      const context = await handler.queryRoute(request, {
-        requestContext,
-      });
+      const context = await handler.queryRoute(request);
 
       if (isResponse(context)) {
-        return context;
+        return context as UnknownResponse;
       }
 
-      return new Response("Not found", { status: 404 });
+      return json({ message: "Not found" }, 404);
     } catch (reason) {
-      if (options.onError) {
+      if (options?.onError) {
         options.onError(reason);
       } else {
         console.error(reason);
       }
 
       if (isRouteErrorResponse(reason)) {
-        return json({ message: reason.statusText }, reason.status);
+        return json({ message: reason.statusText }, 500);
       }
 
       return json({ message: "Internal Server Error" }, 500);

@@ -14,9 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-    "noEmit": true
-    // "declaration": true,
-    // "emitDeclarationOnly": true,
-    // "outDir": "dist"
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist"
   }
 }

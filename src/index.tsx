@@ -4,9 +4,6 @@ import * as image from "./routes/image.$key";
 import * as landing from "./routes/landing";
 import * as upload from "./routes/upload";
 
-export { type ImageGET } from "./routes/image.$key";
-export { type UploadPOST } from "./routes/upload";
-
 const handler = createHandler([
   {
     id: "landing",

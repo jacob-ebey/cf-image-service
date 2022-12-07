@@ -1,6 +1,10 @@
 import { renderToString } from "preact-render-to-string";
 
-import { type DataFunctionArgs, type TypedRequest } from "../cf-helpers";
+import {
+  UnknownResponse,
+  type DataFunctionArgs,
+  type TypedRequest,
+} from "../cf-helpers";
 import { type RequestContext } from "../types";
 import { Landing } from "../ui/landing";
 

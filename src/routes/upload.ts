@@ -81,7 +81,7 @@ export async function action({
     }
   }
 
-  return json({ images: results });
+  return json({ images: results }, 200);
 }
 
 function buf2hex(buffer: ArrayBuffer) {

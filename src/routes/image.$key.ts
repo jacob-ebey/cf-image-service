@@ -1,6 +1,11 @@
 import ImageJS, { Image } from "image-js";
 
-import { json, type DataFunctionArgs, type TypedRequest } from "../cf-helpers";
+import {
+  json,
+  UnknownResponse,
+  type DataFunctionArgs,
+  type TypedRequest,
+} from "../cf-helpers";
 import { type RequestContext } from "../types";
 
 export type ImageGET = TypedRequest<
@@ -36,9 +41,12 @@ export async function loader({
           : undefined;
 
       if (width < 0 || height < 0) {
-        return json({
-          message: "Invalid width or height",
-        });
+        return json(
+          {
+            message: "Invalid width or height",
+          },
+          200
+        );
       }
 
       if (width > 0 || height > 0) {
