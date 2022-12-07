@@ -3,7 +3,7 @@ import ImageJS, { Image } from "image-js";
 import { json, type DataFunctionArgs, type TypedRequest } from "../cf-helpers";
 import { type RequestContext } from "../types";
 
-export type POST = TypedRequest<
+export type UploadPOST = TypedRequest<
   "POST",
   "/upload",
   {},
@@ -15,7 +15,7 @@ export type POST = TypedRequest<
 export async function action({
   context: { env },
   request,
-}: DataFunctionArgs<POST, RequestContext>) {
+}: DataFunctionArgs<UploadPOST, RequestContext>) {
   const results: {
     key: string;
   }[] = [];

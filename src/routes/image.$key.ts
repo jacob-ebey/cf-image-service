@@ -3,7 +3,7 @@ import ImageJS, { Image } from "image-js";
 import { json, type DataFunctionArgs, type TypedRequest } from "../cf-helpers";
 import { type RequestContext } from "../types";
 
-export type GET = TypedRequest<
+export type ImageGET = TypedRequest<
   "GET",
   `/${string}`,
   {
@@ -18,7 +18,7 @@ export async function loader({
   context: { env },
   params: { "*": key },
   request,
-}: DataFunctionArgs<GET, RequestContext>) {
+}: DataFunctionArgs<ImageGET, RequestContext>) {
   if (key) {
     const obj = await env.FILES_BUCKET.get(key);
 
