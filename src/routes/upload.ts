@@ -7,7 +7,7 @@ import ImageJS from "image-js";
 
 import { type RequestContext } from "../types";
 
-export type UploadPOST = TypedRequest<"POST", "/upload", never, "images">;
+export type UploadPOST = TypedRequest<"POST", "upload", never, "images">;
 
 export async function action({
   context: { env },
@@ -20,7 +20,6 @@ export async function action({
   const contentType = request.headers.get("Content-Type");
   if (contentType && contentType.match(/multipart\/form-data/)) {
     const formData = await request.formData();
-    //    ^?
     const images = formData.getAll("images");
     for (const file of images) {
       if (!file || typeof file === "string") {
