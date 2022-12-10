@@ -18,9 +18,9 @@
     "wrangler": "^2.6.1"
   },
   "dependencies": {
-    "@remix-run/router": "^1.0.5-pre.2",
     "image-js": "^0.35.2",
     "preact": "^10.11.3",
-    "preact-render-to-string": "^5.2.6"
+    "preact-render-to-string": "^5.2.6",
+    "remix-router-cf-worker": "0.0.7"
   }
 }

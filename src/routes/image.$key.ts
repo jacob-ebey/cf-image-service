@@ -1,36 +1,28 @@
-import ImageJS, { Image } from "image-js";
-
 import {
   json,
-  UnknownResponse,
+  typedURL,
   type DataFunctionArgs,
   type TypedRequest,
-} from "../cf-helpers";
+} from "remix-router-cf-worker";
+import ImageJS, { Image } from "image-js";
+
 import { type RequestContext } from "../types";
 
-export type ImageGET = TypedRequest<
-  "GET",
-  `/${string}`,
-  {
-    w: "The with to scale the image to.";
-    h: "The height to scale the image to. This is ignored if aspect is set to preserve and width is set.";
-    aspect: "Whether to preserve the aspect ratio of the image. Set to `p` or `preserve` to preserve the aspect ratio.";
-  },
-  {}
->;
+export type ImageGET = TypedRequest<"GET", `image/*`, "w" | "h" | "aspect">;
 
 export async function loader({
   context: { env },
   params: { "*": key },
   request,
-}: DataFunctionArgs<ImageGET, RequestContext>) {
+}: DataFunctionArgs<ImageGET, RequestContext> & { params: { "*": string } }) {
   if (key) {
     const obj = await env.FILES_BUCKET.get(key);
 
     if (obj && obj.key) {
-      const widthParam = request.typedURL.searchParams.get("w");
-      const heightParam = request.typedURL.searchParams.get("h");
-      const aspectParam = request.typedURL.searchParams.get("aspect");
+      const url = typedURL(request);
+      const widthParam = url.searchParams.get("w");
+      const heightParam = url.searchParams.get("h");
+      const aspectParam = url.searchParams.get("aspect");
 
       const preserveAspectRatio =
         aspectParam === "p" || aspectParam === "preserve";
@@ -45,7 +37,7 @@ export async function loader({
           {
             message: "Invalid width or height",
           },
-          200
+          400
         );
       }
 

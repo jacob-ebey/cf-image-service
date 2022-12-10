@@ -1,21 +1,25 @@
-import { renderToString } from "preact-render-to-string";
-
 import {
-  UnknownResponse,
   type DataFunctionArgs,
   type TypedRequest,
-} from "../cf-helpers";
+} from "remix-router-cf-worker";
+import { renderToString } from "preact-render-to-string";
+
 import { type RequestContext } from "../types";
 import { Landing } from "../ui/landing";
 
 import * as upload from "./upload";
 
-type GET = TypedRequest<"GET", "/", {}, {}>;
+type GET = TypedRequest<
+  "GET",
+  "/"
+  // {},
+  // {}
+>;
 type POST = TypedRequest<
   "POST",
-  "/",
-  upload.UploadPOST[" searchParams "],
-  upload.UploadPOST[" formDataFields "]
+  "/"
+  // upload.UploadPOST[" searchParams "],
+  // upload.UploadPOST[" formDataFields "]
 >;
 
 export function loader({}: DataFunctionArgs<GET, RequestContext>) {
